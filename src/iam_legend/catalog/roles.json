@@ -1,0 +1,7 @@
+{
+  "roles/storage.admin": {
+    "title": "Storage Admin",
+    "stage": "GA",
+    "permissions": ["storage.buckets.create", "storage.buckets.delete", "storage.buckets.get", "storage.buckets.list", "storage.buckets.update", "storage.objects.create", "storage.objects.delete", "storage.objects.get", "storage.objects.list", "storage.objects.update"]
+  }
+}

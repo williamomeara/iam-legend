@@ -1,0 +1,4 @@
+google_storage_bucket:
+  create: [storage.buckets.create]
+  update: [storage.buckets.update]
+  delete: [storage.buckets.delete]

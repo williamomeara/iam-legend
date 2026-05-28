@@ -1,0 +1,5 @@
+{
+  "storage.buckets.create": ["storage.buckets.create"],
+  "storage.buckets.update": ["storage.buckets.update"],
+  "storage.buckets.delete": ["storage.buckets.delete"]
+}
