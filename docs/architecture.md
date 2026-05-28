@@ -1,5 +1,12 @@
 # iam-legend — Architecture
 
+> **High-detail version (for Devpost upload, slide decks, presentations):**
+> [`architecture-detailed.png`](architecture-detailed.png) — 2400×1350, shows callers → surfaces → core sub-modules → external dependencies → catalog refresh pipeline.
+
+![iam-legend detailed architecture](architecture-detailed.png)
+
+The Mermaid diagram below is the same architecture in a text-rendered form (handy on GitHub, in PRs, or where image attachments aren't ideal):
+
 ```mermaid
 flowchart TB
     subgraph clients["Interactive clients"]
