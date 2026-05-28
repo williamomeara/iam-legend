@@ -17,8 +17,7 @@ from iam_legend.parsers.terraform_hcl import TerraformHCLParser
 from iam_legend.parsers.adk_python import ADKPythonParser
 from iam_legend.parsers.gcloud_sh import GcloudShellParser
 from iam_legend.recommender.grants import generate_grant_commands
-from iam_legend.recommender.justify import justify_recommendation
-from iam_legend.recommender.set_cover import cover
+from iam_legend.recommender.recommend import recommend
 from iam_legend.types import (
     AccessRequestDraft, DetectedGCPResource, FullReport, LiveState,
     RoleRecommendation,
@@ -106,8 +105,7 @@ def analyze(
             rr.warnings.append(f"live IAM diff unavailable: {e}")
 
     missing_perms = set(live_state.missing) if live_state else set(rr.permissions)
-    rc = cover(missing_perms, catalog)
-    reasoning = justify_recommendation(rc, missing_perms)
+    rec = recommend(missing_perms, catalog, project_id=project)
 
     deployer = "unknown-principal"
     if principal == "self":
@@ -118,8 +116,8 @@ def analyze(
     else:
         deployer = principal
 
-    grant_cmds = generate_grant_commands(rc.chosen, project or "<PROJECT_ID>", deployer)
-    access_req = _draft_access_request(sorted(missing_perms), rc.chosen, deployer, project)
+    grant_cmds = generate_grant_commands(rec.roles, project or "<PROJECT_ID>", deployer)
+    access_req = _draft_access_request(sorted(missing_perms), rec.roles, deployer, project)
 
     return FullReport(
         resources=resources,
@@ -128,7 +126,7 @@ def analyze(
         by_file=rr.by_file,
         live_state=live_state,
         recommendation=RoleRecommendation(
-            roles=rc.chosen, reasoning=reasoning, alternatives=rc.alternatives,
+            roles=rec.roles, reasoning=rec.reasoning, alternatives=rec.alternatives,
         ),
         grant_commands=grant_cmds,
         access_request=access_req,

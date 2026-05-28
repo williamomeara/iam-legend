@@ -14,7 +14,7 @@ from mcp.server.fastmcp import FastMCP
 from iam_legend.analyze import analyze as _analyze
 from iam_legend.catalog.loader import load_catalog
 from iam_legend.recommender.grants import generate_grant_commands as _grants
-from iam_legend.recommender.justify import justify_recommendation
+from iam_legend.recommender.recommend import recommend as _recommend
 from iam_legend.recommender.set_cover import cover as _cover
 
 
@@ -60,17 +60,23 @@ def build_server() -> FastMCP:
     @server.tool()
     def recommend_roles(
         permissions: list[str],
-        avoid: list[str] | None = None,
+        project_id: str | None = None,
     ) -> dict:
-        """Recommend a minimal set of predefined roles covering the given perms."""
+        """Recommend a minimal set of predefined roles covering the given perms.
+
+        Uses the hybrid recommender: greedy set-cover proposes 5 candidate
+        bundles (per-service / consolidate / narrow / strict-per-service
+        strategies), Gemini picks the best for the given context, deterministic
+        fallback if Gemini is unavailable or hallucinates.
+        """
         c = load_catalog()
-        avoid_set = set(avoid) if avoid else {"roles/owner", "roles/editor", "roles/viewer", "roles/iam.securityAdmin"}
-        rc = _cover(set(permissions), c, avoid=avoid_set)
-        reasoning = justify_recommendation(rc, set(permissions))
+        rec = _recommend(set(permissions), c, project_id=project_id)
         return {
-            "roles": rc.chosen,
-            "uncovered": rc.uncovered,
-            "reasoning": reasoning,
+            "roles": rec.roles,
+            "uncovered": rec.uncovered,
+            "reasoning": rec.reasoning,
+            "alternatives": rec.alternatives,
+            "source": rec.source,
         }
 
     @server.tool()
