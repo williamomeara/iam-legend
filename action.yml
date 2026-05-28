@@ -1,0 +1,21 @@
+name: iam-legend
+description: AI code review for GCP IAM gaps before terraform apply.
+inputs:
+  terraform-plan:
+    description: Path to terraform plan JSON output.
+    required: false
+  working-directory:
+    description: Repo root to scan when no plan is provided.
+    required: false
+    default: '.'
+  project-id:
+    description: GCP project the deploy targets.
+    required: true
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    IAM_LEGEND_MODE: action
+    INPUT_TERRAFORM_PLAN: ${{ inputs.terraform-plan }}
+    INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
+    INPUT_PROJECT_ID: ${{ inputs.project-id }}
