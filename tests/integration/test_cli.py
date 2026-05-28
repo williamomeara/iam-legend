@@ -17,10 +17,13 @@ def test_cli_lookup():
 
 
 def test_cli_review_with_plan_outputs_json():
-    # mix_stderr=False keeps stdout (the JSON payload) separate from stderr,
-    # where Gemini-fallback warnings now emit ::warning:: annotations.
-    runner = CliRunner(mix_stderr=False)
-    with patch("iam_legend.recommender.justify._call_gemini", side_effect=RuntimeError("offline")):
+    # Click 8.2+ separates stdout and stderr automatically — use result.stdout
+    # to read the JSON without picking up our ::warning:: stderr annotations.
+    # Mock both Gemini call sites (justify and review-format) so the fallback
+    # path is deterministic in test env without Vertex creds.
+    runner = CliRunner()
+    with patch("iam_legend.recommender.justify._call_gemini", side_effect=RuntimeError("offline")), \
+         patch("iam_legend.reviewer.format._call_gemini", side_effect=RuntimeError("offline")):
         result = runner.invoke(cli, [
             "review",
             "--plan", str(FIXTURE),
