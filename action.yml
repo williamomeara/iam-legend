@@ -15,6 +15,18 @@ inputs:
     description: GitHub token used to post the PR review. Default uses the workflow's GITHUB_TOKEN.
     required: false
     default: ${{ github.token }}
+  vertex-project:
+    description: GCP project hosting the Vertex AI Gemini calls. Defaults to project-id. Required for the Gemini-written review prose path; if absent, iam-legend falls back to templated prose.
+    required: false
+    default: ''
+  vertex-location:
+    description: Vertex AI region for Gemini calls.
+    required: false
+    default: 'us-central1'
+  vertex-model:
+    description: Gemini model identifier (e.g. gemini-flash-latest, gemini-pro-latest).
+    required: false
+    default: 'gemini-flash-latest'
 runs:
   using: docker
   image: Dockerfile
@@ -23,6 +35,12 @@ runs:
     INPUT_TERRAFORM_PLAN: ${{ inputs.terraform-plan }}
     INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
     INPUT_PROJECT_ID: ${{ inputs.project-id }}
-    # Docker-based actions don't automatically inherit GITHUB_TOKEN; forward it
-    # explicitly so the CLI's PR-posting code can authenticate.
+    # Docker-based actions don't automatically inherit GITHUB_TOKEN; forward
+    # it explicitly so the CLI's PR-posting code can authenticate.
     GITHUB_TOKEN: ${{ inputs.github-token }}
+    # Vertex Gemini configuration. Without these set, the recommender +
+    # reviewer fall back to templated prose. The action's runtime SA needs
+    # roles/aiplatform.user on $VERTEX_PROJECT.
+    VERTEX_PROJECT: ${{ inputs.vertex-project }}
+    VERTEX_LOCATION: ${{ inputs.vertex-location }}
+    VERTEX_MODEL: ${{ inputs.vertex-model }}

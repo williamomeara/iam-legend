@@ -13,6 +13,15 @@ case "$MODE" in
     project="${INPUT_PROJECT_ID:?project-id is required}"
     repo_full="${GITHUB_REPOSITORY:?GITHUB_REPOSITORY not set}"
 
+    # Default VERTEX_PROJECT to the target project-id if the action input was
+    # left empty. The Gemini calls expect VERTEX_PROJECT to be set; if it
+    # remains empty, the recommender + reviewer fall back to templated prose.
+    if [[ -z "${VERTEX_PROJECT:-}" ]]; then
+      export VERTEX_PROJECT="$project"
+    fi
+    # VERTEX_LOCATION and VERTEX_MODEL fall back to the in-code defaults if
+    # the workflow didn't set them — no extra handling needed here.
+
     # GitHub Actions exposes the event payload as a JSON file at
     # $GITHUB_EVENT_PATH. For pull_request events, .pull_request.number is
     # the PR id; for issue_comment events targeted at PRs, .issue.number is
