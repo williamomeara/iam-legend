@@ -1,4 +1,392 @@
+# ============================================================
+# Terraform google_* resources (Tier 1, ~50)
+# ============================================================
+
 google_storage_bucket:
   create: [storage.buckets.create]
   update: [storage.buckets.update]
   delete: [storage.buckets.delete]
+
+google_storage_bucket_iam_member:
+  create: [storage.buckets.getIamPolicy, storage.buckets.setIamPolicy]
+  update: [storage.buckets.getIamPolicy, storage.buckets.setIamPolicy]
+  delete: [storage.buckets.getIamPolicy, storage.buckets.setIamPolicy]
+
+google_storage_bucket_object:
+  create: [storage.objects.create]
+  update: [storage.objects.update]
+  delete: [storage.objects.delete]
+
+google_cloud_run_v2_service:
+  create: [run.services.create, iam.serviceAccounts.actAs]
+  update: [run.services.update, iam.serviceAccounts.actAs]
+  delete: [run.services.delete]
+
+google_cloud_run_v2_job:
+  create: [run.jobs.create, iam.serviceAccounts.actAs]
+  update: [run.jobs.update, iam.serviceAccounts.actAs]
+  delete: [run.jobs.delete]
+
+google_compute_instance:
+  create: [compute.instances.create, iam.serviceAccounts.actAs]
+  update: [compute.instances.setMetadata]
+  delete: [compute.instances.delete]
+
+google_compute_network:
+  create: [compute.networks.create]
+  update: [compute.networks.update]
+  delete: [compute.networks.delete]
+
+google_compute_subnetwork:
+  create: [compute.subnetworks.create]
+  update: [compute.subnetworks.update]
+  delete: [compute.subnetworks.delete]
+
+google_compute_firewall:
+  create: [compute.firewalls.create]
+  update: [compute.firewalls.update]
+  delete: [compute.firewalls.delete]
+
+google_container_cluster:
+  create: [container.clusters.create]
+  update: [container.clusters.update]
+  delete: [container.clusters.delete]
+
+google_container_node_pool:
+  create: [container.clusters.update]
+  update: [container.clusters.update]
+  delete: [container.clusters.update]
+
+google_iam_service_account:
+  create: [iam.serviceAccounts.create]
+  update: [iam.serviceAccounts.update]
+  delete: [iam.serviceAccounts.delete]
+
+google_iam_service_account_key:
+  create: [iam.serviceAccountKeys.create]
+  delete: [iam.serviceAccountKeys.delete]
+
+google_project_iam_member:
+  create: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+  update: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+  delete: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+
+google_project_iam_binding:
+  create: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+  update: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+  delete: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+
+google_project_service:
+  create: [serviceusage.services.enable]
+  delete: [serviceusage.services.disable]
+
+google_pubsub_topic:
+  create: [pubsub.topics.create]
+  update: [pubsub.topics.update]
+  delete: [pubsub.topics.delete]
+
+google_pubsub_subscription:
+  create: [pubsub.subscriptions.create]
+  update: [pubsub.subscriptions.update]
+  delete: [pubsub.subscriptions.delete]
+
+google_bigquery_dataset:
+  create: [bigquery.datasets.create]
+  update: [bigquery.datasets.update]
+  delete: [bigquery.datasets.delete]
+
+google_bigquery_table:
+  create: [bigquery.tables.create]
+  update: [bigquery.tables.update]
+  delete: [bigquery.tables.delete]
+
+google_firestore_database:
+  create: [datastore.databases.create]
+  update: [datastore.databases.update]
+  delete: [datastore.databases.delete]
+
+google_sql_database_instance:
+  create: [cloudsql.instances.create]
+  update: [cloudsql.instances.update]
+  delete: [cloudsql.instances.delete]
+
+google_sql_database:
+  create: [cloudsql.databases.create]
+  update: [cloudsql.databases.update]
+  delete: [cloudsql.databases.delete]
+
+google_secret_manager_secret:
+  create: [secretmanager.secrets.create]
+  update: [secretmanager.secrets.update]
+  delete: [secretmanager.secrets.delete]
+
+google_secret_manager_secret_version:
+  create: [secretmanager.versions.add]
+  delete: [secretmanager.versions.destroy]
+
+google_cloud_tasks_queue:
+  create: [cloudtasks.queues.create]
+  update: [cloudtasks.queues.update]
+  delete: [cloudtasks.queues.delete]
+
+google_cloud_scheduler_job:
+  create: [cloudscheduler.jobs.create]
+  update: [cloudscheduler.jobs.update]
+  delete: [cloudscheduler.jobs.delete]
+
+google_vertex_ai_endpoint:
+  create: [aiplatform.endpoints.create]
+  update: [aiplatform.endpoints.update]
+  delete: [aiplatform.endpoints.delete]
+  required_apis: [aiplatform.googleapis.com]
+
+google_vertex_ai_dataset:
+  create: [aiplatform.datasets.create]
+  update: [aiplatform.datasets.update]
+  delete: [aiplatform.datasets.delete]
+  required_apis: [aiplatform.googleapis.com]
+
+google_logging_project_sink:
+  create: [logging.sinks.create]
+  update: [logging.sinks.update]
+  delete: [logging.sinks.delete]
+
+google_monitoring_alert_policy:
+  create: [monitoring.alertPolicies.create]
+  update: [monitoring.alertPolicies.update]
+  delete: [monitoring.alertPolicies.delete]
+
+google_artifact_registry_repository:
+  create: [artifactregistry.repositories.create]
+  update: [artifactregistry.repositories.update]
+  delete: [artifactregistry.repositories.delete]
+
+google_cloudbuild_trigger:
+  create: [cloudbuild.builds.create]
+  update: [cloudbuild.builds.update]
+  delete: [cloudbuild.builds.delete]
+
+google_kms_key_ring:
+  create: [cloudkms.keyRings.create]
+
+google_kms_crypto_key:
+  create: [cloudkms.cryptoKeys.create]
+  update: [cloudkms.cryptoKeys.update]
+
+google_dns_managed_zone:
+  create: [dns.managedZones.create]
+  update: [dns.managedZones.update]
+  delete: [dns.managedZones.delete]
+
+google_redis_instance:
+  create: [redis.instances.create]
+  update: [redis.instances.update]
+  delete: [redis.instances.delete]
+
+google_app_engine_application:
+  create: [appengine.applications.create]
+  update: [appengine.applications.update]
+
+google_cloudfunctions2_function:
+  create: [cloudfunctions.functions.create, iam.serviceAccounts.actAs]
+  update: [cloudfunctions.functions.update, iam.serviceAccounts.actAs]
+  delete: [cloudfunctions.functions.delete]
+
+google_dataflow_job:
+  create: [dataflow.jobs.create]
+  delete: [dataflow.jobs.cancel]
+
+google_dataproc_cluster:
+  create: [dataproc.clusters.create]
+  update: [dataproc.clusters.update]
+  delete: [dataproc.clusters.delete]
+
+google_spanner_instance:
+  create: [spanner.instances.create]
+  update: [spanner.instances.update]
+  delete: [spanner.instances.delete]
+
+google_spanner_database:
+  create: [spanner.databases.create]
+  update: [spanner.databases.update]
+  delete: [spanner.databases.delete]
+
+google_bigtable_instance:
+  create: [bigtable.instances.create]
+  update: [bigtable.instances.update]
+  delete: [bigtable.instances.delete]
+
+# ============================================================
+# ADK / Vertex / Gemini Enterprise / Discovery Engine (Tier 1, ~25)
+# Keys are the synthetic "kind" emitted by adk_python parser.
+# ============================================================
+
+vertex.agent_engine_create:
+  create:
+    - aiplatform.reasoningEngines.create
+    - aiplatform.reasoningEngines.deploy
+    - storage.objects.create
+    - storage.objects.get
+  required_apis: [aiplatform.googleapis.com]
+
+vertex.agent_engine_update:
+  create:
+    - aiplatform.reasoningEngines.update
+    - aiplatform.reasoningEngines.deploy
+  required_apis: [aiplatform.googleapis.com]
+
+vertex.agent_engine_delete:
+  create:
+    - aiplatform.reasoningEngines.delete
+  required_apis: [aiplatform.googleapis.com]
+
+vertex.agent_engine_query:
+  create:
+    - aiplatform.reasoningEngines.query
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.endpoint_create:
+  create: [aiplatform.endpoints.create]
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.endpoint_deploy_model:
+  create: [aiplatform.endpoints.deploy]
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.model_upload:
+  create: [aiplatform.models.upload, storage.objects.get]
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.custom_job_create:
+  create: [aiplatform.customJobs.create, iam.serviceAccounts.actAs]
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.batch_prediction_job_create:
+  create: [aiplatform.batchPredictionJobs.create]
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.vertex_init:
+  create: []
+  required_apis: [aiplatform.googleapis.com]
+
+aiplatform.generate_content:
+  create: [aiplatform.endpoints.predict]
+  required_apis: [aiplatform.googleapis.com]
+
+discoveryengine.datastore_create:
+  create: [discoveryengine.dataStores.create]
+  required_apis: [discoveryengine.googleapis.com]
+
+discoveryengine.datastore_delete:
+  create: [discoveryengine.dataStores.delete]
+  required_apis: [discoveryengine.googleapis.com]
+
+discoveryengine.engine_create:
+  create: [discoveryengine.engines.create]
+  required_apis: [discoveryengine.googleapis.com]
+
+discoveryengine.engine_delete:
+  create: [discoveryengine.engines.delete]
+  required_apis: [discoveryengine.googleapis.com]
+
+discoveryengine.document_import:
+  create: [discoveryengine.documents.import]
+  required_apis: [discoveryengine.googleapis.com]
+
+storage.bucket_create_imperative:
+  create: [storage.buckets.create]
+
+storage.bucket_delete_imperative:
+  create: [storage.buckets.delete]
+
+storage.blob_upload_imperative:
+  create: [storage.objects.create]
+
+storage.blob_download_imperative:
+  create: [storage.objects.get]
+
+pubsub.topic_publish_imperative:
+  create: [pubsub.topics.publish]
+
+pubsub.subscription_pull_imperative:
+  create: [pubsub.subscriptions.consume]
+
+secretmanager.access_secret_imperative:
+  create: [secretmanager.versions.access]
+
+bigquery.query_imperative:
+  create: [bigquery.jobs.create, bigquery.tables.getData]
+
+firestore.document_write_imperative:
+  create: [datastore.entities.create]
+
+# ============================================================
+# gcloud verbs (Tier 1, ~30)
+# Keys are emitted by gcloud_sh parser.
+# ============================================================
+
+gcloud.storage.buckets.create:
+  create: [storage.buckets.create]
+gcloud.storage.buckets.delete:
+  create: [storage.buckets.delete]
+gcloud.storage.cp:
+  create: [storage.objects.create, storage.objects.get]
+gcloud.iam.service_accounts.create:
+  create: [iam.serviceAccounts.create]
+gcloud.iam.service_accounts.delete:
+  create: [iam.serviceAccounts.delete]
+gcloud.iam.service_accounts.keys.create:
+  create: [iam.serviceAccountKeys.create]
+gcloud.iam.roles.create:
+  create: [iam.roles.create]
+gcloud.iam.roles.update:
+  create: [iam.roles.update]
+gcloud.projects.add_iam_policy_binding:
+  create: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+gcloud.projects.remove_iam_policy_binding:
+  create: [resourcemanager.projects.getIamPolicy, resourcemanager.projects.setIamPolicy]
+gcloud.services.enable:
+  create: [serviceusage.services.enable]
+gcloud.services.disable:
+  create: [serviceusage.services.disable]
+gcloud.run.deploy:
+  create: [run.services.create, run.services.update, iam.serviceAccounts.actAs]
+gcloud.run.jobs.create:
+  create: [run.jobs.create, iam.serviceAccounts.actAs]
+gcloud.run.services.delete:
+  create: [run.services.delete]
+gcloud.compute.instances.create:
+  create: [compute.instances.create, iam.serviceAccounts.actAs]
+gcloud.compute.networks.create:
+  create: [compute.networks.create]
+gcloud.compute.firewall_rules.create:
+  create: [compute.firewalls.create]
+gcloud.container.clusters.create:
+  create: [container.clusters.create]
+gcloud.container.clusters.delete:
+  create: [container.clusters.delete]
+gcloud.pubsub.topics.create:
+  create: [pubsub.topics.create]
+gcloud.pubsub.subscriptions.create:
+  create: [pubsub.subscriptions.create]
+gcloud.secrets.create:
+  create: [secretmanager.secrets.create]
+gcloud.secrets.versions.add:
+  create: [secretmanager.versions.add]
+gcloud.artifacts.repositories.create:
+  create: [artifactregistry.repositories.create]
+gcloud.artifacts.docker.images.push:
+  create: [artifactregistry.repositories.uploadArtifacts]
+gcloud.builds.submit:
+  create: [cloudbuild.builds.create]
+gcloud.functions.deploy:
+  create: [cloudfunctions.functions.create, cloudfunctions.functions.update, iam.serviceAccounts.actAs]
+gcloud.ai.agents.deploy:
+  create:
+    - aiplatform.reasoningEngines.create
+    - aiplatform.reasoningEngines.deploy
+  required_apis: [aiplatform.googleapis.com]
+gcloud.sql.instances.create:
+  create: [cloudsql.instances.create]
+gcloud.bigquery.datasets.create:
+  create: [bigquery.datasets.create]
