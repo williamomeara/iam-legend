@@ -344,7 +344,7 @@ def shot5_close_frame() -> Path:
     y_url = H - 180
     urls = [
         "github.com/williamomeara/iam-legend",
-        "iam-legend-372139006998.us-central1.run.app",
+        "iam-legend-935195616837.us-central1.run.app",
         "github.com/williamomeara/iam-legend-validation-demo/pull/1",
     ]
     for u in urls:
@@ -504,44 +504,41 @@ def compose_video(durations: dict[str, float]) -> Path:
         ("5_close", "shot5_close.png", durations["5_close"]),
     ]
 
-    # 1) Render each shot to a video clip with a slow ken-burns zoom
+    # 1) Render each shot to a video clip. Each clip is the audio length plus
+    #    a TAIL_GAP seconds of held image + silence — gives the viewer a beat
+    #    between shots so the cuts don't feel jittery.
+    TAIL_GAP = 1.0
     clips: list[Path] = []
     for name, frame, dur in shots:
         clip = BUILD / f"clip_{name}.mp4"
         frame_path = BUILD / "frames" / frame
-        # Static frame (no zoom) at 30fps — keeps the pipeline simple and avoids
-        # zooming distorting the text. We rely on cuts + audio for pace.
+        total = dur + TAIL_GAP
         cmd = [
             "ffmpeg",
             "-y",
-            "-loop",
-            "1",
-            "-framerate",
-            "30",
-            "-t",
-            f"{dur:.3f}",
-            "-i",
-            str(frame_path),
-            "-i",
-            str(BUILD / "audio" / f"{name}.wav"),
-            "-c:v",
-            "libx264",
-            "-pix_fmt",
-            "yuv420p",
+            "-loop", "1",
+            "-framerate", "30",
+            "-t", f"{total:.3f}",
+            "-i", str(frame_path),
+            "-i", str(BUILD / "audio" / f"{name}.wav"),
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
             "-vf",
-            f"fade=in:0:15,fade=out:{int(dur * 30) - 15}:15",
-            "-c:a",
-            "aac",
-            "-b:a",
-            "192k",
-            "-ar",
-            "44100",
-            "-shortest",
+            # Fade in over the first 15 frames; fade out over the last 15.
+            # The fade-out sits inside the TAIL_GAP silence so it doesn't bite
+            # into the spoken audio.
+            f"fade=in:0:15,fade=out:{int(total * 30) - 15}:15",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-ar", "44100",
+            # Pad the audio with TAIL_GAP seconds of silence at the end so it
+            # matches the image's extended duration.
+            "-af", f"apad=pad_dur={TAIL_GAP}",
             str(clip),
         ]
         subprocess.run(cmd, check=True, capture_output=True)
         clips.append(clip)
-        print(f"  clip {name}: {dur:.2f}s")
+        print(f"  clip {name}: {dur:.2f}s + {TAIL_GAP:.1f}s gap = {total:.2f}s")
 
     # 2) Concat the clips
     concat_list = BUILD / "concat.txt"

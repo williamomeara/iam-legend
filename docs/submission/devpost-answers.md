@@ -6,7 +6,7 @@ Final answers to copy-paste into the Devpost submission form.
 
 - **Code:** https://github.com/williamomeara/iam-legend
 - **Demo PR (live):** https://github.com/williamomeara/iam-legend-validation-demo/pull/1
-- **Hosted Cloud Run MCP:** https://iam-legend-372139006998.us-central1.run.app
+- **Hosted Cloud Run MCP:** https://iam-legend-935195616837.us-central1.run.app
 - **Release:** https://github.com/williamomeara/iam-legend/releases/tag/v0.1.1
 - **Architecture diagram:** docs/architecture.md
 - **Design spec:** docs/superpowers/specs/2026-05-28-iam-legend-design.md
@@ -75,7 +75,7 @@ Three things that surprised me:
 
 ### 3. Readiness for launch
 
-Production-ready for early users. The GitHub Action is published at `williamomeara/iam-legend@v0.1.1`; the MCP server is deployed on Cloud Run with a public auth-gated endpoint at https://iam-legend-372139006998.us-central1.run.app; the catalog covers ~100 IaC kinds with `0` catalog warnings on all 7 official Google ADK starter templates; the recommender uses a hybrid set-cover + Gemini-picker architecture with deterministic fallback; 68 tests pass in ~3 seconds; failure modes are exercised and fail-soft. The live demo PR at https://github.com/williamomeara/iam-legend-validation-demo/pull/1 is a real PR with a real review posted by the bot on an unmodified `agent-starter-pack` repo. Next steps for full launch: pre-built GHCR image (eliminate Docker build on every Action run, drops latency from ~50s to ~5s), GitHub Marketplace publication, broader catalog (currently strong on GCP, would extend to AWS/Azure for multi-cloud orgs).
+Production-ready for early users. The GitHub Action is published at `williamomeara/iam-legend@v0.1.1`; the MCP server is deployed on Cloud Run with a public auth-gated endpoint at https://iam-legend-935195616837.us-central1.run.app; the catalog covers ~100 IaC kinds with `0` catalog warnings on all 7 official Google ADK starter templates; the recommender uses a hybrid set-cover + Gemini-picker architecture with deterministic fallback; 68 tests pass in ~3 seconds; failure modes are exercised and fail-soft. The live demo PR at https://github.com/williamomeara/iam-legend-validation-demo/pull/1 is a real PR with a real review posted by the bot on an unmodified `agent-starter-pack` repo. Next steps for full launch: pre-built GHCR image (eliminate Docker build on every Action run, drops latency from ~50s to ~5s), GitHub Marketplace publication, broader catalog (currently strong on GCP, would extend to AWS/Azure for multi-cloud orgs).
 
 ### 4. Most critical Agent Platform feature / what's currently missing
 

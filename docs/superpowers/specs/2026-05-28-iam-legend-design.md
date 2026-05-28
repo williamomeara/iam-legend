@@ -578,7 +578,7 @@ This section records the as-built state vs. the design spec above. Added 2026-05
 
 ### What was built per spec
 
-- **MCP server (FastMCP) on stdio + Cloud Run streamable-HTTP** — §6, §8.1 — built and deployed at `https://iam-legend-372139006998.us-central1.run.app`. Privileged tools (live IAM diff, auto-plan) are gated to stdio per §8.2 security model; verified in production via `tools/list`.
+- **MCP server (FastMCP) on stdio + Cloud Run streamable-HTTP** — §6, §8.1 — built and deployed at `https://iam-legend-935195616837.us-central1.run.app`. Privileged tools (live IAM diff, auto-plan) are gated to stdio per §8.2 security model; verified in production via `tools/list`.
 - **Four parsers** — §5 — terraform_plan, terraform_hcl (with line recovery), adk_python (with import-alias resolution), gcloud_sh. All four register against the dispatcher per §5.1.
 - **Hybrid recommender** — §7.4 — set-cover proposes 5 candidate bundles using 4 distinct scoring strategies; Gemini picks by index; catalog-verified before return; deterministic fallback if Gemini fails or hallucinates.
 - **GitHub Action** — §8.4 — Docker-based, runs as the deployer SA via WIF, posts PR review with PyGithub. Published at `williamomeara/iam-legend@v0.1.1`.
@@ -617,7 +617,7 @@ Locked in by `tests/parsers/test_canonical_starter_pack.py`.
 ### Live demo
 
 - **Public PR with iam-legend posting a real review:** https://github.com/williamomeara/iam-legend-validation-demo/pull/1
-- **Hosted MCP endpoint:** https://iam-legend-372139006998.us-central1.run.app (Cloud Run, `iam-legend-runtime` SA with `roles/aiplatform.user` only)
+- **Hosted MCP endpoint:** https://iam-legend-935195616837.us-central1.run.app (Cloud Run, `iam-legend-runtime` SA with `roles/aiplatform.user` only)
 - **Workload Identity Federation:** pool `iam-legend-demo` + provider `github-demo` on `tendermatch-prod`, restricted to `repository_owner == 'williamomeara'`
 - **Deployer SA in demo:** `iam-legend-demo-deployer@tendermatch-prod` — intentionally limited to `roles/storage.admin` + `roles/run.admin` + `roles/aiplatform.user` so iam-legend has 13–14 missing perms to surface
 

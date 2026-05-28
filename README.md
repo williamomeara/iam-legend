@@ -6,7 +6,7 @@ Built for the **[Google for Startups AI Agents Challenge 2026](https://googlesta
 
 **Live demo:**
 - 🤖 **PR review bot in action:** [iam-legend-validation-demo/pull/1](https://github.com/williamomeara/iam-legend-validation-demo/pull/1) — posted by the bot, on an unmodified Google `agent-starter-pack` project
-- 🌐 **Hosted Cloud Run MCP:** `https://iam-legend-372139006998.us-central1.run.app` (read-only, auth-gated)
+- 🌐 **Hosted Cloud Run MCP:** `https://iam-legend-935195616837.us-central1.run.app` (read-only, auth-gated)
 - 📦 **Action:** `uses: williamomeara/iam-legend@v0.1.1`
 - 📐 **Architecture:** [docs/architecture.md](docs/architecture.md)
 
