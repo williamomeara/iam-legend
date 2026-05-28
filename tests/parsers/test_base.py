@@ -1,4 +1,4 @@
-from iam_legend.parsers.base import register, all_parsers, walk_repo
+from iam_legend.parsers.base import register, walk_repo
 from iam_legend.types import DetectedGCPResource
 
 

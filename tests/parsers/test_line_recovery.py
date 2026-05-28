@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from iam_legend.parsers.line_recovery import recover_lines
 

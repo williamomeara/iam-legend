@@ -1,5 +1,5 @@
 from iam_legend.catalog.loader import load_catalog
-from iam_legend.recommender.set_cover import cover, RoleCandidates
+from iam_legend.recommender.set_cover import cover
 
 
 def test_single_role_covers_all():

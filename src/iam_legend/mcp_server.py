@@ -15,7 +15,6 @@ from iam_legend.analyze import analyze as _analyze
 from iam_legend.catalog.loader import load_catalog
 from iam_legend.recommender.grants import generate_grant_commands as _grants
 from iam_legend.recommender.recommend import recommend as _recommend
-from iam_legend.recommender.set_cover import cover as _cover
 
 
 def build_server() -> FastMCP:

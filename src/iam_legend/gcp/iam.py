@@ -4,7 +4,7 @@ from __future__ import annotations
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from iam_legend.gcp.auth import AuthError, get_credentials
+from iam_legend.gcp.auth import get_credentials
 
 
 def test_iam_permissions(project: str, permissions: list[str]) -> dict:

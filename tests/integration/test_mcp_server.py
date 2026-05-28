@@ -1,6 +1,4 @@
-import os
 from pathlib import Path
-from unittest.mock import patch
 
 from iam_legend.mcp_server import build_server
 

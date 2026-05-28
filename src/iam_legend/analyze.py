@@ -3,15 +3,13 @@ call into here. Pure Python — no protocol-specific code.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any
 
 from iam_legend.catalog.loader import load_catalog
 from iam_legend.catalog.resolver import resolve
 from iam_legend.gcp.auth import who_am_i, AuthError
 from iam_legend.gcp import iam as iam_module
-from iam_legend.parsers.base import all_parsers, walk_repo
+from iam_legend.parsers.base import walk_repo
 from iam_legend.parsers.terraform_plan import TerraformPlanParser
 from iam_legend.parsers.terraform_hcl import TerraformHCLParser
 from iam_legend.parsers.adk_python import ADKPythonParser
@@ -29,24 +27,24 @@ def _draft_access_request(
 ) -> AccessRequestDraft:
     subject = f"[iam-legend] Grant {len(roles)} role(s) to deployer SA"
     body_lines = [
-        f"Hi platform team,",
-        f"",
-        f"To ship the current PR's terraform apply, the deployer SA",
+        "Hi platform team,",
+        "",
+        "To ship the current PR's terraform apply, the deployer SA",
         f"`{deployer}`{' on project `' + project + '`' if project else ''}",
-        f"needs the following predefined role(s):",
-        f"",
+        "needs the following predefined role(s):",
+        "",
     ]
     for r in roles:
         body_lines.append(f"  • {r}")
     body_lines += [
-        f"",
+        "",
         f"These cover the {len(missing)} permission(s) the current set of resources",
-        f"requires that the SA does not yet hold. iam-legend confirmed this against",
-        f"the live project IAM policy.",
-        f"",
-        f"Happy to chat through justifications per-permission if useful.",
-        f"",
-        f"— iam-legend",
+        "requires that the SA does not yet hold. iam-legend confirmed this against",
+        "the live project IAM policy.",
+        "",
+        "Happy to chat through justifications per-permission if useful.",
+        "",
+        "— iam-legend",
     ]
     return AccessRequestDraft(subject=subject, body="\n".join(body_lines))
 
