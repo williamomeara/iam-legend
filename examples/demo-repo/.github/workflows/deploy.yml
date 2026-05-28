@@ -1,0 +1,41 @@
+name: deploy
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  iam-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.9.0'
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.DEPLOYER_SA }}
+
+      - name: terraform plan
+        working-directory: ./terraform
+        run: |
+          terraform init
+          terraform plan -out=plan.tfplan -var="project_id=${{ secrets.PROJECT_ID }}"
+          terraform show -json plan.tfplan > plan.json
+
+      - uses: iam-legend/iam-legend@v1
+        with:
+          terraform-plan: ./terraform/plan.json
+          working-directory: .
+          project-id: ${{ secrets.PROJECT_ID }}
