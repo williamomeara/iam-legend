@@ -34,7 +34,9 @@ def _call_gemini(prompt: str) -> str:
     from vertexai.generative_models import GenerativeModel
 
     vertex_init(project=project, location=location)
-    model_name = os.getenv("VERTEX_MODEL", "gemini-flash-latest")
+    # Note: `gemini-flash-latest` is an AI Studio alias — it does NOT resolve
+    # on Vertex AI. Use a Vertex-supported identifier like `gemini-2.5-flash`.
+    model_name = os.getenv("VERTEX_MODEL", "gemini-2.5-flash")
     model = GenerativeModel(model_name)
     resp = model.generate_content(prompt)
     return resp.text.strip()
@@ -56,7 +58,16 @@ def justify_recommendation(rc: RoleCandidates, required_perms: set[str]) -> str:
     )
     try:
         return _call_gemini(prompt)
-    except Exception:
+    except Exception as e:
+        # Silent fallback is dangerous — surfaces in templated reviews that
+        # look identical to the Gemini path being mis-configured. Log so the
+        # next debug session is one log line away.
+        import sys
+        print(
+            f"::warning title=iam-legend::Gemini justify call failed; "
+            f"using templated fallback. Error: {type(e).__name__}: {e}",
+            file=sys.stderr,
+        )
         return _template_fallback(rc, required_perms)
 
 

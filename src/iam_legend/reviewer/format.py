@@ -39,7 +39,9 @@ def _call_gemini(prompt: str) -> str:
     from vertexai.generative_models import GenerativeModel
 
     vertex_init(project=project, location=location)
-    model_name = os.getenv("VERTEX_MODEL", "gemini-flash-latest")
+    # Vertex's Gemini IDs differ from AI Studio's aliases. `gemini-2.5-flash`
+    # is a stable Vertex name; `gemini-flash-latest` will 404 here.
+    model_name = os.getenv("VERTEX_MODEL", "gemini-2.5-flash")
     return GenerativeModel(model_name).generate_content(prompt).text.strip()
 
 
@@ -81,7 +83,14 @@ def format_review(report: FullReport, deployer: str) -> ReviewPayload:
             reasoning=report.recommendation.reasoning,
         )
         body_prose = _call_gemini(prompt)
-    except Exception:
+    except Exception as e:
+        # Surface the reason so silent template-only reviews are debuggable.
+        import sys
+        print(
+            f"::warning title=iam-legend::Gemini review-prose call failed; "
+            f"using templated fallback. Error: {type(e).__name__}: {e}",
+            file=sys.stderr,
+        )
         body_prose = _template_body(report, deployer, missing)
 
     comments = _build_inline_comments(report, missing)

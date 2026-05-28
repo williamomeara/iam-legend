@@ -24,9 +24,9 @@ inputs:
     required: false
     default: 'us-central1'
   vertex-model:
-    description: Gemini model identifier (e.g. gemini-flash-latest, gemini-pro-latest).
+    description: Vertex AI Gemini model identifier (e.g. gemini-2.5-flash, gemini-2.5-pro). Note - AI Studio aliases like gemini-flash-latest do NOT work on Vertex.
     required: false
-    default: 'gemini-flash-latest'
+    default: 'gemini-2.5-flash'
 runs:
   using: docker
   image: Dockerfile
