@@ -1,0 +1,10 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.0",
+  "resource_changes": [
+    {"address": "google_storage_bucket.data", "mode": "managed", "type": "google_storage_bucket", "name": "data", "change": {"actions": ["create"]}},
+    {"address": "google_pubsub_topic.events", "mode": "managed", "type": "google_pubsub_topic", "name": "events", "change": {"actions": ["update"]}},
+    {"address": "google_iam_service_account.bot", "mode": "managed", "type": "google_iam_service_account", "name": "bot", "change": {"actions": ["delete"]}},
+    {"address": "module.net.google_compute_network.vpc", "mode": "managed", "type": "google_compute_network", "name": "vpc", "change": {"actions": ["no-op"]}}
+  ]
+}
