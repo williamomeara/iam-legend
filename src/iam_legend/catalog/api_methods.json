@@ -27830,14 +27830,32 @@
   "iam.serviceAccounts.update": [
     "iam.serviceAccounts.update"
   ],
+  "iam.workloadIdentityPoolProviders.create": [
+    "iam.workloadIdentityPoolProviders.create"
+  ],
+  "iam.workloadIdentityPoolProviders.delete": [
+    "iam.workloadIdentityPoolProviders.delete"
+  ],
+  "iam.workloadIdentityPoolProviders.update": [
+    "iam.workloadIdentityPoolProviders.update"
+  ],
+  "iam.workloadIdentityPools.create": [
+    "iam.workloadIdentityPools.create"
+  ],
   "iam.workloadIdentityPools.createPolicyBinding": [
     "iam.workloadIdentityPools.createPolicyBinding"
+  ],
+  "iam.workloadIdentityPools.delete": [
+    "iam.workloadIdentityPools.delete"
   ],
   "iam.workloadIdentityPools.deletePolicyBinding": [
     "iam.workloadIdentityPools.deletePolicyBinding"
   ],
   "iam.workloadIdentityPools.searchPolicyBindings": [
     "iam.workloadIdentityPools.searchPolicyBindings"
+  ],
+  "iam.workloadIdentityPools.update": [
+    "iam.workloadIdentityPools.update"
   ],
   "iam.workloadIdentityPools.updatePolicyBinding": [
     "iam.workloadIdentityPools.updatePolicyBinding"

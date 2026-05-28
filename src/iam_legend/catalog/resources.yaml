@@ -62,6 +62,35 @@ google_iam_service_account:
   update: [iam.serviceAccounts.update]
   delete: [iam.serviceAccounts.delete]
 
+# Alias used by the agent-starter-pack and older provider versions.
+google_service_account:
+  create: [iam.serviceAccounts.create]
+  update: [iam.serviceAccounts.update]
+  delete: [iam.serviceAccounts.delete]
+
+google_service_account_iam_member:
+  create: [iam.serviceAccounts.getIamPolicy, iam.serviceAccounts.setIamPolicy]
+  update: [iam.serviceAccounts.getIamPolicy, iam.serviceAccounts.setIamPolicy]
+  delete: [iam.serviceAccounts.getIamPolicy, iam.serviceAccounts.setIamPolicy]
+
+google_service_account_iam_binding:
+  create: [iam.serviceAccounts.getIamPolicy, iam.serviceAccounts.setIamPolicy]
+  update: [iam.serviceAccounts.getIamPolicy, iam.serviceAccounts.setIamPolicy]
+  delete: [iam.serviceAccounts.getIamPolicy, iam.serviceAccounts.setIamPolicy]
+
+google_iam_workload_identity_pool:
+  create: [iam.workloadIdentityPools.create]
+  update: [iam.workloadIdentityPools.update]
+  delete: [iam.workloadIdentityPools.delete]
+
+google_iam_workload_identity_pool_provider:
+  create: [iam.workloadIdentityPoolProviders.create]
+  update: [iam.workloadIdentityPoolProviders.update]
+  delete: [iam.workloadIdentityPoolProviders.delete]
+
+google_project_service_identity:
+  create: [serviceusage.services.enable]
+
 google_iam_service_account_key:
   create: [iam.serviceAccountKeys.create]
   delete: [iam.serviceAccountKeys.delete]
@@ -139,6 +168,36 @@ google_vertex_ai_endpoint:
   update: [aiplatform.endpoints.update]
   delete: [aiplatform.endpoints.delete]
   required_apis: [aiplatform.googleapis.com]
+
+# The Terraform form of Vertex Agent Engine — the resource the official
+# agent-starter-pack uses. (The synthetic `vertex.agent_engine_create` key
+# below is the ADK Python parser's emit; this is the HCL one.)
+google_vertex_ai_reasoning_engine:
+  create:
+    - aiplatform.reasoningEngines.create
+    - aiplatform.reasoningEngines.deploy
+    - storage.objects.create
+    - storage.objects.get
+  update:
+    - aiplatform.reasoningEngines.update
+    - aiplatform.reasoningEngines.deploy
+  delete:
+    - aiplatform.reasoningEngines.delete
+  required_apis: [aiplatform.googleapis.com]
+
+google_bigquery_connection:
+  create: [bigquery.connections.create]
+  update: [bigquery.connections.update]
+  delete: [bigquery.connections.delete]
+
+google_logging_project_bucket_config:
+  create: [logging.buckets.create]
+  update: [logging.buckets.update]
+  delete: [logging.buckets.delete]
+
+google_logging_linked_dataset:
+  create: [logging.links.create]
+  delete: [logging.links.delete]
 
 google_vertex_ai_dataset:
   create: [aiplatform.datasets.create]

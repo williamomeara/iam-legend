@@ -13,6 +13,15 @@ _HARD_DENY = {
     "roles/owner", "roles/editor", "roles/viewer", "roles/iam.securityAdmin",
 }
 
+# Service-agent roles are managed by Google and bound to Google-managed
+# service accounts; they should never be recommended for a user-managed SA.
+# The set-cover algorithm doesn't know this, so we screen them out by name.
+_SERVICE_AGENT_SUFFIXES = ("ServiceAgent", "serviceAgent")
+
+
+def _is_service_agent_role(role_name: str) -> bool:
+    return any(role_name.endswith(s) for s in _SERVICE_AGENT_SUFFIXES)
+
 
 @dataclass(slots=True)
 class RoleCandidates:
@@ -34,6 +43,8 @@ def cover(
     candidates: dict[str, set[str]] = {}
     for role_name, data in catalog.roles.items():
         if role_name in avoid:
+            continue
+        if _is_service_agent_role(role_name):
             continue
         perms = set(data.get("permissions", []))
         overlap = perms & required

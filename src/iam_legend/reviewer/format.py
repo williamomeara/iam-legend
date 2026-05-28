@@ -114,24 +114,31 @@ def _template_body(report: FullReport, deployer: str, missing: list[str]) -> str
 
 
 def _build_inline_comments(report: FullReport, missing: list[str]) -> list[InlineComment]:
+    """One comment per (file, line). Lists ONLY the perms required by the
+    resource AT that line, deduplicated. Earlier versions used the file-level
+    aggregation, which leaked perms from other resources in the same file.
+    """
+    from iam_legend.catalog.loader import load_catalog
+
+    catalog = load_catalog()
     missing_set = set(missing)
     out: list[InlineComment] = []
     seen: set[tuple[str, int]] = set()
     for r in report.resources:
         if r.line <= 0:
             continue
-        perms = report.by_file.get(r.file, [])
-        relevant = [p for p in perms if p in missing_set]
-        if not relevant:
-            continue
         key = (r.file, r.line)
         if key in seen:
+            continue
+        per_resource = catalog.lookup_resource(r.kind, r.operation) or []
+        relevant = sorted({p for p in per_resource if p in missing_set})
+        if not relevant:
             continue
         seen.add(key)
         body = (
             f"💡 **iam-legend**: this `{r.kind}` requires permission(s) the deployer SA "
             f"is missing:\n"
-            + "\n".join(f"- `{p}`" for p in sorted(relevant))
+            + "\n".join(f"- `{p}`" for p in relevant)
         )
         out.append(InlineComment(file=r.file, line=r.line, body=body))
     return out
