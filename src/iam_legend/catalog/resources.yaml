@@ -199,6 +199,18 @@ google_logging_linked_dataset:
   create: [logging.links.create]
   delete: [logging.links.delete]
 
+google_discovery_engine_search_engine:
+  create: [discoveryengine.engines.create]
+  update: [discoveryengine.engines.update]
+  delete: [discoveryengine.engines.delete]
+  required_apis: [discoveryengine.googleapis.com]
+
+google_discovery_engine_data_store:
+  create: [discoveryengine.dataStores.create]
+  update: [discoveryengine.dataStores.update]
+  delete: [discoveryengine.dataStores.delete]
+  required_apis: [discoveryengine.googleapis.com]
+
 google_vertex_ai_dataset:
   create: [aiplatform.datasets.create]
   update: [aiplatform.datasets.update]
