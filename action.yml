@@ -2,15 +2,19 @@ name: iam-legend
 description: AI code review for GCP IAM gaps before terraform apply.
 inputs:
   terraform-plan:
-    description: Path to terraform plan JSON output.
+    description: Path to terraform plan JSON output (optional; falls back to static HCL scan).
     required: false
   working-directory:
-    description: Repo root to scan when no plan is provided.
+    description: Repo root or subdirectory to scan.
     required: false
     default: '.'
   project-id:
     description: GCP project the deploy targets.
     required: true
+  github-token:
+    description: GitHub token used to post the PR review. Default uses the workflow's GITHUB_TOKEN.
+    required: false
+    default: ${{ github.token }}
 runs:
   using: docker
   image: Dockerfile
@@ -19,3 +23,6 @@ runs:
     INPUT_TERRAFORM_PLAN: ${{ inputs.terraform-plan }}
     INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
     INPUT_PROJECT_ID: ${{ inputs.project-id }}
+    # Docker-based actions don't automatically inherit GITHUB_TOKEN; forward it
+    # explicitly so the CLI's PR-posting code can authenticate.
+    GITHUB_TOKEN: ${{ inputs.github-token }}
