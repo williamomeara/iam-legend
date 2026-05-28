@@ -122,10 +122,41 @@ def _template_body(report: FullReport, deployer: str, missing: list[str]) -> str
     return "\n".join(lines)
 
 
+def _to_repo_relative(path: str) -> str:
+    """Convert an absolute or workspace-rooted path to a repo-relative one.
+
+    The GitHub PR-review API rejects inline comments whose `path` field
+    isn't repo-relative (it returns 422 "Path could not be resolved"). Our
+    parsers emit absolute paths from `Path.rglob()`, which under GitHub
+    Actions look like `/github/workspace/<repo>/foo.tf`. Strip the workspace
+    prefix.
+    """
+    import os
+    workspace = os.environ.get("GITHUB_WORKSPACE")
+    if workspace and path.startswith(workspace):
+        return os.path.relpath(path, workspace)
+    # Last-resort heuristic: if the path is absolute, return just the part
+    # after `/iam-legend-validation-demo/` or `/<reponame>/`-style segments.
+    # Otherwise return as-is (already relative).
+    if path.startswith("/"):
+        # Walk down looking for a segment that looks like a repo name, then
+        # use everything after it. This is best-effort; the workspace env
+        # var above is the authoritative path.
+        parts = path.split(os.sep)
+        for i in range(len(parts) - 1, 0, -1):
+            if parts[i] in {"workspace"} and i + 2 < len(parts):
+                # /home/runner/work/<repo>/<repo>/...
+                return os.sep.join(parts[i + 2:])
+        return path
+    return path
+
+
 def _build_inline_comments(report: FullReport, missing: list[str]) -> list[InlineComment]:
     """One comment per (file, line). Lists ONLY the perms required by the
     resource AT that line, deduplicated. Earlier versions used the file-level
     aggregation, which leaked perms from other resources in the same file.
+
+    File paths are normalised to repo-relative form for the GitHub API.
     """
     from iam_legend.catalog.loader import load_catalog
 
@@ -136,7 +167,8 @@ def _build_inline_comments(report: FullReport, missing: list[str]) -> list[Inlin
     for r in report.resources:
         if r.line <= 0:
             continue
-        key = (r.file, r.line)
+        rel_path = _to_repo_relative(r.file)
+        key = (rel_path, r.line)
         if key in seen:
             continue
         per_resource = catalog.lookup_resource(r.kind, r.operation) or []
@@ -149,5 +181,5 @@ def _build_inline_comments(report: FullReport, missing: list[str]) -> list[Inlin
             f"is missing:\n"
             + "\n".join(f"- `{p}`" for p in relevant)
         )
-        out.append(InlineComment(file=r.file, line=r.line, body=body))
+        out.append(InlineComment(file=rel_path, line=r.line, body=body))
     return out
