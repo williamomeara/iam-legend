@@ -98,6 +98,19 @@ def main() -> None:
     server = build_server()
     transport = os.environ.get("IAM_LEGEND_TRANSPORT", "stdio")
     if transport == "http":
+        # Cloud Run requires listening on 0.0.0.0:$PORT (default 8080).
+        port = int(os.environ.get("PORT", "8080"))
+        server.settings.host = "0.0.0.0"
+        server.settings.port = port
+        # Cloud Run rewrites the Host header; FastMCP's DNS-rebinding protection
+        # rejects unknown hosts. Disable it here — Cloud Run terminates TLS in
+        # front of us and the service is IAM-auth-gated anyway.
+        from mcp.server.transport_security import TransportSecuritySettings
+        server.settings.transport_security = TransportSecuritySettings(
+            enable_dns_rebinding_protection=False,
+            allowed_hosts=["*"],
+            allowed_origins=["*"],
+        )
         server.run(transport="streamable-http")
     else:
         server.run(transport="stdio")
