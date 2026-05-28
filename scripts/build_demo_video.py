@@ -21,8 +21,9 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
+import torch
 from PIL import Image, ImageDraw, ImageFont
-from kokoro import KPipeline
+from chatterbox.tts import ChatterboxTTS
 
 REPO_ROOT = Path(__file__).parent.parent
 BUILD = Path("/tmp/iam-legend-video")
@@ -52,20 +53,20 @@ VO_SCRIPT = [
     {
         "shot": "2_what",
         "text": (
-            "iam-legend is the G C P I A M toolbelt that lives between plan and apply. "
-            "One Python core, three surfaces. "
+            "I Am Legend is the G C P I A M toolbelt that lives between plan and apply. "
+            "One Python core. Three surfaces. "
             "A FastMCP server. A GitHub Action that posts A I code reviews. And a C L I. "
             "Model Context Protocol at the center. Deterministic math at the core. "
-            "Gemini at the edges for judgment and prose."
+            "Gemini at the edges, for judgment and prose."
         ),
     },
     {
         "shot": "3_hero",
         "text": (
-            "Every pull request push triggers iam-legend. "
-            "It runs as the actual deployer service account via Workload Identity Federation. "
+            "Every pull request push triggers I Am Legend. "
+            "It runs as the actual deployer service account, via Workload Identity Federation. "
             "Hits live test I A M permissions. "
-            "Picks the smallest set of predefined roles using Gemini. "
+            "Picks the smallest set of predefined roles, using Gemini. "
             "And posts a code review with copy-paste ready G cloud grant commands. "
             "Notice Gemini flagging that roles slash I A M slash dev ops is broad. "
             "Surfaced in band. Not buried in a separate review."
@@ -74,7 +75,7 @@ VO_SCRIPT = [
     {
         "shot": "4_mcp",
         "text": (
-            "Same engine, plug into any M C P client. "
+            "Same engine. Plug into any M C P client. "
             "Gemini C L I. Claude Code. Cursor. "
             "They all get an I A M aware partner. "
             "Without forking custom code."
@@ -85,7 +86,7 @@ VO_SCRIPT = [
         "text": (
             "Validated against all seven official Google A D K starter templates. "
             "Zero catalog gaps on any of them. "
-            "iam-legend. "
+            "I Am Legend. "
             "Stop deploying. Start shipping."
         ),
     },
@@ -93,10 +94,31 @@ VO_SCRIPT = [
 
 
 def generate_audio() -> dict[str, float]:
-    """Generate one wav per shot. Returns {shot_name: duration_seconds}."""
-    print("== Generating VO audio with Kokoro ==", flush=True)
-    pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M")
+    """Generate one wav per shot using Chatterbox (Resemble AI).
+
+    Chatterbox produces notably more natural prosody than Kokoro at the cost
+    of ~real-time generation on MPS (vs <real-time on CPU for Kokoro). Model
+    loads once and is reused across all shots.
+    """
     durations: dict[str, float] = {}
+    # Check cache first — if all WAVs exist, skip the (expensive) model load.
+    cached_all = all(
+        (BUILD / "audio" / f"{s['shot']}.wav").exists() for s in VO_SCRIPT
+    )
+    if cached_all:
+        for s in VO_SCRIPT:
+            out_path = BUILD / "audio" / f"{s['shot']}.wav"
+            data, sr = sf.read(out_path)
+            durations[s["shot"]] = len(data) / sr
+            print(f"  {s['shot']}: cached ({durations[s['shot']]:.2f}s)")
+        return durations
+
+    print("== Generating VO audio with Chatterbox ==", flush=True)
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
+    print(f"  device: {device}", flush=True)
+    model = ChatterboxTTS.from_pretrained(device=device)
+    print(f"  model loaded — generating {len(VO_SCRIPT)} shots", flush=True)
+
     for s in VO_SCRIPT:
         out_path = BUILD / "audio" / f"{s['shot']}.wav"
         if out_path.exists():
@@ -104,18 +126,24 @@ def generate_audio() -> dict[str, float]:
             durations[s["shot"]] = len(data) / sr
             print(f"  {s['shot']}: cached ({durations[s['shot']]:.2f}s)")
             continue
-        chunks = []
-        for _, _, audio in pipeline(s["text"], voice="af_bella", speed=0.95):
-            arr = audio.numpy() if hasattr(audio, "numpy") else audio
+        # Chatterbox generates the whole utterance at once. For longer shots,
+        # split on sentence boundaries to keep individual generations under
+        # the model's preferred token horizon (~1000 tokens ~= ~30s of audio).
+        sentences = [c.strip() for c in s["text"].split(". ") if c.strip()]
+        chunks: list[np.ndarray] = []
+        for sent in sentences:
+            if not sent.endswith("."):
+                sent += "."
+            wav = model.generate(sent)
+            arr = wav.squeeze().cpu().numpy()
             chunks.append(arr)
-            # add 200ms of silence between phrase chunks for breathing room
-            chunks.append(np.zeros(int(0.20 * 24000), dtype=arr.dtype))
-        # Drop the trailing silence
+            # 180ms inter-sentence silence
+            chunks.append(np.zeros(int(0.18 * model.sr), dtype=arr.dtype))
         if chunks:
-            chunks.pop()
-        full = np.concatenate(chunks)
-        sf.write(out_path, full, 24000)
-        durations[s["shot"]] = len(full) / 24000
+            chunks.pop()  # drop trailing silence
+        full = np.concatenate(chunks).astype(np.float32)
+        sf.write(out_path, full, model.sr)
+        durations[s["shot"]] = len(full) / model.sr
         print(f"  {s['shot']}: {durations[s['shot']]:.2f}s → {out_path}")
     return durations
 
@@ -149,6 +177,22 @@ def _font(size: int, mono: bool = False) -> ImageFont.FreeTypeFont:
             except Exception:
                 continue
     return ImageFont.load_default()
+
+
+FIGMA_FRAMES = BUILD / "frames-figma"
+
+
+def use_figma_or_render(figma_name: str, render_fn) -> Path:
+    """Prefer the Figma-exported PNG if present; otherwise fall back to Pillow."""
+    figma_path = FIGMA_FRAMES / figma_name
+    out = BUILD / "frames" / figma_name
+    if figma_path.exists():
+        # Copy/symlink the Figma version. Re-copy each run so any Figma updates flow through.
+        from shutil import copyfile
+        copyfile(figma_path, out)
+        print(f"  [figma] {figma_name}")
+        return out
+    return render_fn()
 
 
 def shot1_hook_frame() -> Path:
@@ -403,10 +447,14 @@ def capture_pr_screenshot() -> Path:
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 1500, "height": 1400}, device_scale_factor=2)
+        # Larger viewport + 2x device scale → ~4800x3600 raw → crisp downscale.
+        page = browser.new_page(viewport={"width": 2400, "height": 1800}, device_scale_factor=2)
         url = f"https://github.com/williamomeara/iam-legend-validation-demo/pull/1#{anchor}"
-        page.goto(url, wait_until="networkidle")
-        page.wait_for_timeout(3000)
+        # GitHub pages have continual background activity (auto-refresh,
+        # analytics) and rarely hit `networkidle`. Wait for DOM + an
+        # explicit settle window instead.
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(5000)
         # Locate the review's container by id and screenshot just that element
         elem = page.locator(f"#{anchor}").first
         try:
@@ -418,9 +466,9 @@ def capture_pr_screenshot() -> Path:
             page.screenshot(path=str(out))
         browser.close()
 
-    # Pad onto 1920x1080 with title
+    # Pad onto 1920x1080 with title. Lanczos resampling for sharp downscale.
     pr = Image.open(out).convert("RGB")
-    pr.thumbnail((1620, 880))
+    pr.thumbnail((1700, 900), Image.Resampling.LANCZOS)
     canvas = Image.new("RGB", (W, H), BG)
     draw = ImageDraw.Draw(canvas)
     draw.text(
@@ -526,11 +574,13 @@ def main() -> None:
     durations = generate_audio()
     print()
     print("== Rendering visuals ==")
-    shot1_hook_frame()
-    render_mermaid_diagram()
+    # Prefer Figma-designed PNGs from /tmp/iam-legend-video/frames-figma/;
+    # fall back to Pillow renders if a Figma export is missing.
+    use_figma_or_render("shot1_hook.png", shot1_hook_frame)
+    use_figma_or_render("shot2_architecture.png", render_mermaid_diagram)
     capture_pr_screenshot()
-    shot4_mcp_frame()
-    shot5_close_frame()
+    use_figma_or_render("shot4_mcp.png", shot4_mcp_frame)
+    use_figma_or_render("shot5_close.png", shot5_close_frame)
     print()
     print("== Composing video ==")
     out = compose_video(durations)
