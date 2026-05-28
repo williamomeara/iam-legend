@@ -1,0 +1,94 @@
+# Map: fully-qualified callable -> { kind, operation }
+# After import-alias resolution, AST call sites are matched against these keys.
+
+vertexai.agent_engines.create:
+  kind: vertex.agent_engine_create
+  operation: create
+
+vertexai.agent_engines.AgentEngine.create:
+  kind: vertex.agent_engine_create
+  operation: create
+
+vertexai.agent_engines.update:
+  kind: vertex.agent_engine_update
+  operation: update
+
+vertexai.agent_engines.delete:
+  kind: vertex.agent_engine_delete
+  operation: delete
+
+vertexai.agent_engines.AgentEngine.query:
+  kind: vertex.agent_engine_query
+  operation: create
+
+vertexai.init:
+  kind: aiplatform.vertex_init
+  operation: create
+
+google.cloud.aiplatform.init:
+  kind: aiplatform.vertex_init
+  operation: create
+
+google.cloud.aiplatform.Endpoint.create:
+  kind: aiplatform.endpoint_create
+  operation: create
+
+google.cloud.aiplatform.Endpoint.deploy:
+  kind: aiplatform.endpoint_deploy_model
+  operation: create
+
+google.cloud.aiplatform.Model.upload:
+  kind: aiplatform.model_upload
+  operation: create
+
+google.cloud.aiplatform.CustomJob.run:
+  kind: aiplatform.custom_job_create
+  operation: create
+
+google.cloud.aiplatform.BatchPredictionJob.create:
+  kind: aiplatform.batch_prediction_job_create
+  operation: create
+
+google.cloud.aiplatform.gapic.PredictionServiceClient.generate_content:
+  kind: aiplatform.generate_content
+  operation: create
+
+google.cloud.storage.Client.create_bucket:
+  kind: storage.bucket_create_imperative
+  operation: create
+
+google.cloud.storage.Client.bucket:
+  kind: storage.blob_upload_imperative
+  operation: create
+
+google.cloud.pubsub_v1.PublisherClient.publish:
+  kind: pubsub.topic_publish_imperative
+  operation: create
+
+google.cloud.pubsub_v1.SubscriberClient.pull:
+  kind: pubsub.subscription_pull_imperative
+  operation: create
+
+google.cloud.secretmanager.SecretManagerServiceClient.access_secret_version:
+  kind: secretmanager.access_secret_imperative
+  operation: create
+
+google.cloud.bigquery.Client.query:
+  kind: bigquery.query_imperative
+  operation: create
+
+google.cloud.firestore.Client.collection:
+  kind: firestore.document_write_imperative
+  operation: create
+
+google.cloud.discoveryengine_v1.DataStoreServiceClient.create_data_store:
+  kind: discoveryengine.datastore_create
+  operation: create
+
+google.cloud.discoveryengine_v1.EngineServiceClient.create_engine:
+  kind: discoveryengine.engine_create
+  operation: create
+
+google.cloud.discoveryengine_v1.DocumentServiceClient.import_documents:
+  kind: discoveryengine.document_import
+  operation: create
